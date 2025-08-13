@@ -32,3 +32,4 @@ done
 echo "Kubernetes control-plane setup complete!"
 echo "Cluster status:"
 sudo -u ubuntu kubectl get pods --all-namespaces
+sudo snap install docker
