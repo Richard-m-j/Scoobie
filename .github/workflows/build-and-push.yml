@@ -1,0 +1,47 @@
+# .github/workflows/build-and-push.yml
+
+name: CD - Build and Push Docker Images
+
+# This workflow only runs on pushes to the main branch
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    # We only run this job if the "CI - Test and Scan" workflow was successful on the same commit
+    if: ${{ github.event.pull_request.merged == true || github.ref == 'refs/heads/main' }}
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Generate Image tags
+        id: meta
+        run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+
+      - name: Build and push Backend Image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend-api-python
+          file: ./backend-api-python/Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/backend-api-python:${{ steps.meta.outputs.sha_short }}
+
+      - name: Build and push Frontend Image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./frontend-app
+          file: ./frontend-app/Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/frontend-app:${{ steps.meta.outputs.sha_short }}

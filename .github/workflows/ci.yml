@@ -1,6 +1,6 @@
 # .github/workflows/ci.yml
 
-name: CI - Quality and Security Reports
+name: CI - Test and Scan
 
 on:
   push:
@@ -9,7 +9,7 @@ on:
     branches: [ "main" ]
 
 jobs:
-  quality-and-security-report:
+  test-and-scan:
     runs-on: ubuntu-latest
 
     steps:
@@ -25,22 +25,18 @@ jobs:
       - name: Install Python Dependencies & Tools
         run: |
           python -m pip install --upgrade pip
-          pip install flake8 bandit pip-audit
+          pip install flake8 bandit pip-audit pytest "Flask-SQLAlchemy<3.1"
           if [ -f backend-api-python/requirements.txt ]; then pip install -r backend-api-python/requirements.txt; fi
       
-      - name: Lint Python Code with flake8
-        continue-on-error: true # This step will report errors but not fail the job
+      - name: Lint and Scan Python Code
+        continue-on-error: true
         run: |
-          flake8 backend-api-python/ --count --select=E9,F63,F7,F82 --show-source --statistics
           flake8 backend-api-python/ --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+          bandit -r backend-api-python/ -ll -ii
+          pip-audit
 
-      - name: Scan Python Code with Bandit (SAST)
-        continue-on-error: true # This step will report errors but not fail the job
-        run: bandit -r backend-api-python/ -ll -ii
-
-      - name: Scan Python Dependencies with pip-audit (SCA)
-        continue-on-error: true # This step will report errors but not fail the job
-        run: pip-audit
+      - name: Run Backend Unit Tests with Pytest
+        run: pytest backend-api-python/
 
       # --- FRONTEND CHECKS ---
       - name: Set up Node.js
@@ -52,12 +48,13 @@ jobs:
         working-directory: ./frontend-app
         run: npm install
 
-      - name: Lint Frontend Code with ESLint
-        continue-on-error: true # This step will report errors but not fail the job
+      - name: Lint and Scan Frontend Code
+        continue-on-error: true
         working-directory: ./frontend-app
-        run: npm run lint
-      
-      - name: Scan Frontend Dependencies with NPM Audit (SCA)
-        continue-on-error: true # This step will report errors but not fail the job
+        run: |
+          npm run lint
+          npm audit --audit-level=high
+
+      - name: Run Frontend Unit Tests with Jest
         working-directory: ./frontend-app
-        run: npm audit --audit-level=high
+        run: npm test -- --watchAll=false
