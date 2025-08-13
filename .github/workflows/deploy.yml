@@ -25,23 +25,24 @@ jobs:
 
       - name: Apply Kubernetes Manifests
         run: |
-          echo "Applying all configurations from the /kubernetes directory..."
-          kubectl apply -f ./kubernetes
+          echo "Applying all configurations to the 'scoobie-app' namespace..."
+          # The -n flag specifies the namespace
+          kubectl apply -f ./kubernetes -n scoobie-app
       
       - name: Force new image pull by restarting deployments
         run: |
-          echo "Restarting deployments to pull the latest image..."
-          # Note: Replace with your actual deployment names if different
-          kubectl rollout restart deployment/backend-deployment
-          kubectl rollout restart deployment/frontend-deployment
+          echo "Restarting deployments in 'scoobie-app' namespace..."
+          # Using the correct deployment names from your YAML files
+          kubectl rollout restart deployment/backend-deployment -n scoobie-app
+          kubectl rollout restart deployment/frontend-deployment -n scoobie-app
 
       - name: Verify Backend Deployment Rollout
-        run: kubectl rollout status deployment/backend-deployment --timeout=2m
+        run: kubectl rollout status deployment/backend-deployment -n scoobie-app --timeout=2m
 
       - name: Verify Frontend Deployment Rollout
-        run: kubectl rollout status deployment/frontend-deployment --timeout=2m
+        run: kubectl rollout status deployment/frontend-deployment -n scoobie-app --timeout=2m
       
       - name: Display final status
         run: |
           echo "Deployment successful! Current pod status:"
-          kubectl get pods -o wide
+          kubectl get pods -n scoobie-app -o wide
