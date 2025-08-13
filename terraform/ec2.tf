@@ -10,5 +10,5 @@ resource "aws_instance" "web" {
   tags = {
     Name = "Richard Instance"
   }
-  user_data = file("${path.module}/setup.sh")
+  user_data = file("./setup.sh")
 }
