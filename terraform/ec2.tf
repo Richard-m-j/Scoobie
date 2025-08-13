@@ -5,7 +5,7 @@ provider "aws" {
 
 resource "aws_instance" "web" {
   ami = "ami-04f59c565deeb2199"
-  instance_type = "t2.nano"
+  instance_type = "t2.medium"
   key_name = "richardnv"
   tags = {
     Name = "Richard Instance"
