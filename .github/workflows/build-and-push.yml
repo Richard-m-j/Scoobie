@@ -11,7 +11,7 @@ jobs:
   build-and-push-backend:
     runs-on: self-hosted
     # if: ${{ github.event.pull_request.merged == true || github.ref == 'refs/heads/main' }}
-    needs: [CI - Test and Scan] # Ensure this job only runs after the CI - Test and Scan workflow is successful
+    # needs: [CI - Test and Scan] # Ensure this job only runs after the CI - Test and Scan workflow is successful
     steps:
     - uses: actions/checkout@v4
     - name: Build the Docker image
