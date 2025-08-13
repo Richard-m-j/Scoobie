@@ -10,28 +10,33 @@ on:
 jobs:
   build-and-push-backend:
     runs-on: ubuntu-latest
-    # We only run this job if the "CI - Test and Scan" workflow was successful on the same commit
-    # if: ${{ github.event.pull_request.merged == true || github.ref == 'refs/heads/main' }}
-
     steps:
     - uses: actions/checkout@v4
-    - name: Build the Backend Docker image
-      run: docker build ./backend-api-python/ --tag ${{ secrets.DOCKERHUB_USERNAME }}/scoobie-backend:latest
-    - name: Push Backend image to Docker Hub
+
+    - name: Log in to Docker Hub
+      uses: docker/login-action@v3
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKER_HUB_TOKEN }}
+
+    - name: Build and push the Backend Docker image
       run: |
-        docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKER_HUB_TOKEN }}
+        docker build ./backend-api-python/ --tag ${{ secrets.DOCKERHUB_USERNAME }}/scoobie-backend:latest
         docker push ${{ secrets.DOCKERHUB_USERNAME }}/scoobie-backend:latest
 
   build-and-push-frontend:
     runs-on: ubuntu-latest
-    # We only run this job if the "CI - Test and Scan" workflow was successful on the same commit
     if: ${{ github.event.pull_request.merged == true || github.ref == 'refs/heads/main' }}
-
     steps:
     - uses: actions/checkout@v4
-    - name: Build the Frontend Docker image
-      run: docker build ./frontend-app/ --tag ${{ secrets.DOCKERHUB_USERNAME }}/scoobie-frontend:latest
-    - name: Push Frontend image to Docker Hub
+
+    - name: Log in to Docker Hub
+      uses: docker/login-action@v3
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKER_HUB_TOKEN }}
+
+    - name: Build and push the Frontend Docker image
       run: |
-        docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKER_HUB_TOKEN }}
+        docker build ./frontend-app/ --tag ${{ secrets.DOCKERHUB_USERNAME }}/scoobie-frontend:latest
         docker push ${{ secrets.DOCKERHUB_USERNAME }}/scoobie-frontend:latest
