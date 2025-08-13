@@ -23,14 +23,14 @@ spec:
                 name: postgres-config
             - secretRef:
                 name: postgres-secret
+          # This mount path stays the same
           volumeMounts:
             - name: postgres-storage
               mountPath: /var/lib/postgresql/data
-  volumeClaimTemplates:
-    - metadata:
-        name: postgres-storage
-      spec:
-        accessModes: ["ReadWriteOnce"]
-        resources:
-          requests:
-            storage: 1Gi
+      # This 'volumes' section is NEW
+      volumes:
+        - name: postgres-storage
+          persistentVolumeClaim:
+            # It points to the PVC we created in the previous step
+            claimName: postgres-pvc
+  # The 'volumeClaimTemplates' section has been REMOVED

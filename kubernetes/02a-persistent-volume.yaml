@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: postgres-pv
+  namespace: scoobie-app
+spec:
+  # The amount of storage we are making available
+  capacity:
+    storage: 1Gi
+  # How the volume can be mounted (read-write by a single node)
+  accessModes:
+    - ReadWriteOnce
+  # Tells the volume to use a directory on the host machine
+  hostPath:
+    path: "/data/postgres-data"
