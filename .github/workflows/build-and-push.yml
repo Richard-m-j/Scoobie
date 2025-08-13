@@ -9,7 +9,7 @@ on:
 
 jobs:
   build-and-push-backend:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     # if: ${{ github.event.pull_request.merged == true || github.ref == 'refs/heads/main' }}
 
     steps:
@@ -22,7 +22,7 @@ jobs:
         docker push richardjoseph1/scoobie-backend:latest
 
   build-and-push-frontend:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     # We only run this job if the "CI - Test and Scan" workflow was successful on the same commit
     if: ${{ github.event.pull_request.merged == true || github.ref == 'refs/heads/main' }}
 
