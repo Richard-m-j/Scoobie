@@ -1,14 +1,10 @@
-provider "aws" {
-  region = "us-east-1"
-  shared_credentials_files = ["~/.aws/credentials"]
-}
-
 resource "aws_instance" "web" {
-  ami = "ami-04f59c565deeb2199"
+  ami           = "ami-04f59c565deeb2199"
   instance_type = "t2.medium"
-  key_name = "richardnv"
+  key_name      = "richardnv"
+  # No security group specified = uses default
+  user_data = file("${path.module}/setup.sh")
   tags = {
-    Name = "Richard Instance"
+    Name = "Richard_Instance"
   }
-  user_data = file("./setup.sh")
 }
