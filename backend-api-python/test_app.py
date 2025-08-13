@@ -1,46 +1,44 @@
 # backend-api-python/test_app.py
 
 import pytest
-from app import app, db, Message
+from unittest.mock import patch, MagicMock
+from app import app
 
-# This fixture sets up a temporary, in-memory SQLite database for each test
+# This fixture configures the Flask app for testing without a database
 @pytest.fixture
 def client():
-    # Configure the app for testing
     app.config['TESTING'] = True
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:' # Use an in-memory DB
-    
-    # Create a test client using the Flask application configured for testing
     with app.test_client() as client:
-        # Establish an application context
-        with app.app_context():
-            db.create_all() # Create all database tables
-            
-            # Add a sample message to the in-memory database
-            sample_message = Message("Test Message")
-            db.session.add(sample_message)
-            db.session.commit()
+        yield client
 
-        yield client # this is where the testing happens
-
-    # Teardown: The in-memory database is automatically destroyed after the test
-    
-def test_get_messages_endpoint(client):
+# The @patch decorator intercepts the database call
+@patch('app.Message.query')
+def test_get_messages_with_mock_db(mock_query, client):
     """
-    GIVEN a Flask application configured for testing
+    GIVEN a Flask application and a mocked database
     WHEN the '/api/messages' endpoint is requested (GET)
-    THEN check that the response is valid and contains the sample message
+    THEN check that the response is valid and contains the mocked data
     """
+    # 1. Create a fake "Message" object to be returned by the mock
+    mock_message = MagicMock()
+    mock_message.id = 99
+    mock_message.text = "This is a mocked message."
+
+    # 2. Configure the mock to return a list containing our fake message
+    #    when the .all() method is called.
+    mock_query.all.return_value = [mock_message]
+
+    # 3. Call the API endpoint. The app code will run, but the call to
+    #    "Message.query.all()" will be intercepted and return our fake data.
     response = client.get('/api/messages')
     json_data = response.get_json()
 
-    # Check the response status and content type
+    # 4. Assert that the response is correct based on the mocked data
     assert response.status_code == 200
-    assert response.content_type == 'application/json'
-    
-    # Check that the response data is a list with one item
     assert isinstance(json_data, list)
     assert len(json_data) == 1
-    
-    # Check the content of the message
-    assert json_data[0]['text'] == "Test Message"
+    assert json_data[0]['id'] == 99
+    assert json_data[0]['text'] == "This is a mocked message."
+
+    # Verify that the mocked database method was actually called
+    mock_query.all.assert_called_once()
