@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: backend
-          image: richardjoseph1/scoobie-backend
+          image: richardjoseph1/scoobie-backend:latest
           ports:
             - containerPort: 5000
           env:

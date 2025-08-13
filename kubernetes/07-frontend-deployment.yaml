@@ -15,6 +15,6 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: richardjoseph1/scoobie-frontend
+          image: richardjoseph1/scoobie-frontend:latest
           ports:
             - containerPort: 80
