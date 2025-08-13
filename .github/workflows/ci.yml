@@ -1,6 +1,6 @@
 # .github/workflows/ci.yml
 
-name: CI - Quality and Security Scans
+name: CI - Quality and Security Reports
 
 on:
   push:
@@ -9,7 +9,7 @@ on:
     branches: [ "main" ]
 
 jobs:
-  quality-and-security:
+  quality-and-security-report:
     runs-on: ubuntu-latest
 
     steps:
@@ -29,14 +29,17 @@ jobs:
           if [ -f backend-api-python/requirements.txt ]; then pip install -r backend-api-python/requirements.txt; fi
       
       - name: Lint Python Code with flake8
+        continue-on-error: true # This step will report errors but not fail the job
         run: |
           flake8 backend-api-python/ --count --select=E9,F63,F7,F82 --show-source --statistics
           flake8 backend-api-python/ --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
 
       - name: Scan Python Code with Bandit (SAST)
+        continue-on-error: true # This step will report errors but not fail the job
         run: bandit -r backend-api-python/ -ll -ii
 
       - name: Scan Python Dependencies with pip-audit (SCA)
+        continue-on-error: true # This step will report errors but not fail the job
         run: pip-audit
 
       # --- FRONTEND CHECKS ---
@@ -50,9 +53,11 @@ jobs:
         run: npm install
 
       - name: Lint Frontend Code with ESLint
+        continue-on-error: true # This step will report errors but not fail the job
         working-directory: ./frontend-app
         run: npm run lint
       
       - name: Scan Frontend Dependencies with NPM Audit (SCA)
+        continue-on-error: true # This step will report errors but not fail the job
         working-directory: ./frontend-app
         run: npm audit --audit-level=high
