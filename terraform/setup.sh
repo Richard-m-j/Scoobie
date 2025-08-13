@@ -20,4 +20,3 @@ until sudo -u ubuntu kubectl get pods -n kube-system | grep -Ev 'STATUS|Running'
     sleep 5
 done
 echo "Kubernetes control-plane setup complete."
-git clone https://github.com/Richard-m-j/Scoobie.git
