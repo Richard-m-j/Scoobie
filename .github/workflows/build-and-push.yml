@@ -10,23 +10,28 @@ on:
 jobs:
   build-and-push-backend:
     runs-on: ubuntu-latest
+    # We only run this job if the "CI - Test and Scan" workflow was successful on the same commit
+    # if: ${{ github.event.pull_request.merged == true || github.ref == 'refs/heads/main' }}
+
     steps:
     - uses: actions/checkout@v4
     - name: Build the Backend Docker image
       run: docker build ./backend-api-python/ --tag ${{ secrets.DOCKERHUB_USERNAME }}/scoobie-backend:latest
     - name: Push Backend image to Docker Hub
       run: |
-        echo ${{ secrets.DOCKER_HUB_TOKEN }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
+        docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKER_HUB_TOKEN }}
         docker push ${{ secrets.DOCKERHUB_USERNAME }}/scoobie-backend:latest
 
   build-and-push-frontend:
     runs-on: ubuntu-latest
+    # We only run this job if the "CI - Test and Scan" workflow was successful on the same commit
     if: ${{ github.event.pull_request.merged == true || github.ref == 'refs/heads/main' }}
+
     steps:
     - uses: actions/checkout@v4
     - name: Build the Frontend Docker image
       run: docker build ./frontend-app/ --tag ${{ secrets.DOCKERHUB_USERNAME }}/scoobie-frontend:latest
     - name: Push Frontend image to Docker Hub
       run: |
-        echo ${{ secrets.DOCKER_HUB_TOKEN }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
+        docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKER_HUB_TOKEN }}
         docker push ${{ secrets.DOCKERHUB_USERNAME }}/scoobie-frontend:latest
