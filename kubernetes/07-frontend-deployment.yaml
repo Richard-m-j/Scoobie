@@ -16,5 +16,6 @@ spec:
       containers:
         - name: frontend
           image: richardjoseph1/scoobie-frontend:latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 80
