@@ -8,9 +8,15 @@ from flask_sqlalchemy import SQLAlchemy
 app = Flask(__name__)
 
 # --- Database Configuration ---
-# Use an environment variable for the database URL, with a fallback for local development.
-# This makes it easy to connect to the database in Kubernetes later.
-db_url = os.environ.get("DB_URL", "postgresql://user:password@localhost:5432/mydatabase")
+# Read individual components from environment variables
+db_user = os.environ.get('POSTGRES_USER')
+db_pass = os.environ.get('POSTGRES_PASSWORD')
+db_name = os.environ.get('POSTGRES_DB')
+db_host = os.environ.get('POSTGRES_HOST', 'postgres-service') # Default to the service name
+
+# Construct the database URL from the parts
+db_url = f"postgresql://{db_user}:{db_pass}@{db_host}:5432/{db_name}"
+
 app.config['SQLALCHEMY_DATABASE_URI'] = db_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
@@ -19,9 +25,8 @@ db = SQLAlchemy(app)
 
 
 # --- Database Model ---
-# This class represents the 'messages' table in our database.
 class Message(db.Model):
-    __tablename__ = 'messages' # Optional: Specify table name
+    __tablename__ = 'messages'
     id = db.Column(db.Integer, primary_key=True)
     text = db.Column(db.String(200), nullable=False)
 
@@ -30,35 +35,23 @@ class Message(db.Model):
 
 
 # --- API Endpoint ---
-# This defines a GET endpoint at /api/messages.
 @app.route('/api/messages')
 def get_messages():
-    """Returns all messages from the database as JSON."""
     messages = Message.query.all()
-    # Convert the list of message objects to a list of dictionaries
     results = [
-        {
-            "id": msg.id,
-            "text": msg.text
-        } for msg in messages]
-    
-    # Return the JSON response
+        {"id": msg.id, "text": msg.text} for msg in messages
+    ]
     return jsonify(results)
 
 
 # --- Main Execution ---
-# This block runs only when the script is executed directly (e.g., `python app.py`).
 if __name__ == '__main__':
-    # Create database tables and add a sample message if it's a fresh database
     with app.app_context():
-        db.create_all() # Create tables if they don't exist
-        # Check if there are any messages already
+        db.create_all()
         if not Message.query.first():
-            # If no messages, add a sample one
             sample_message = Message("Hello from the Python Backend! 👋")
             db.session.add(sample_message)
             db.session.commit()
             print("Database initialized and sample message added.")
 
-    # Run the Flask development server
     app.run(host='0.0.0.0', port=5000)
