@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-deployment
+  namespace: scoobie-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+        - name: backend
+          image: richardjoseph1/scoobie-backend
+          ports:
+            - containerPort: 5000
+          env:
+            - name: DB_URL
+              value: "postgresql://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@postgres-service:5432/$(POSTGRES_DB)"
+            - name: POSTGRES_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: postgres-config
+                  key: POSTGRES_USER
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: POSTGRES_PASSWORD
+            - name: POSTGRES_DB
+              valueFrom:
+                configMapKeyRef:
+                  name: postgres-config
+                  key: POSTGRES_DB

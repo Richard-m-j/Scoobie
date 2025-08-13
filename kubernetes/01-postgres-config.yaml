@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: postgres-secret
+  namespace: scoobie-app
+type: Opaque
+stringData:
+  # The password for the database user.
+  POSTGRES_PASSWORD: "yourStrongPassword"
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-config
+  namespace: scoobie-app
+data:
+  # The database name.
+  POSTGRES_DB: "scoobie_db"
+  # The database user.
+  POSTGRES_USER: "scoobie_user"

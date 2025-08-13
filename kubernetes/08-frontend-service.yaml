@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend-service
+  namespace: scoobie-app
+spec:
+  type: NodePort
+  selector:
+    app: frontend
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+      # Port 30007 will be opened on your EC2 instance.
+      nodePort: 30007
