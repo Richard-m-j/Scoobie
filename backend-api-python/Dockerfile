@@ -1,6 +1,6 @@
 # ---- Stage 1: The Builder ----
 # Use a full Python image to build our dependencies
-FROM python:3.9 as builder
+FROM python:3.11 as builder
 
 WORKDIR /usr/src/app
 
@@ -15,7 +15,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # ---- Stage 2: The Final Image ----
 # Use a slim image for a smaller footprint
-FROM python:3.9-slim-buster
+FROM python:3.11-slim-buster
 
 WORKDIR /usr/src/app
 
