@@ -1,4 +1,5 @@
 
+#!/bin/bash
 sudo su
 hostnamectl set-hostname kmaster
 kubeadm init
