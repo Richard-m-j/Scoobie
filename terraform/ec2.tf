@@ -10,4 +10,5 @@ resource "aws_instance" "web" {
   tags = {
     Name = "Richard Instance"
   }
+  user_data = file("setup.sh")
 }
