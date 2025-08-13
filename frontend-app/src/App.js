@@ -21,7 +21,7 @@ function App() {
       setError(''); // Clear any previous errors
     } catch (err) {
       setMessage('');
-      setError('Failed to fetch message. Is the backend running?');
+      setError('Failed to fetch messages. Is the backend running?');
       console.error(err);
     }
   };
