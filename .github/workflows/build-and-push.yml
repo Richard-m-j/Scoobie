@@ -9,7 +9,7 @@ on:
 
 jobs:
   build-and-push:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     # We only run this job if the "CI - Test and Scan" workflow was successful on the same commit
     if: ${{ github.event.pull_request.merged == true || github.ref == 'refs/heads/main' }}
 
