@@ -10,13 +10,14 @@ Scoobie-App is a full-stack web application featuring a React frontend, a Python
 - **Containerization**: Docker
 - **Orchestration**: Kubernetes (Minikube)
 - **Cloud Provider**: AWS (EC2)
-- **CI/CD**: GitHub Actions
+- **CI/CD**: GitHub Actions (with a self-hosted runner)
 
 ---
 
 ## CI/CD Pipeline
 
-The project is configured with a complete CI/CD pipeline using GitHub Actions, which automates the entire process from code commit to deployment. The pipeline is split into several workflows for clarity and separation of concerns.
+The project is configured with a complete CI/CD pipeline using GitHub Actions, which automates the entire process from code commit to deployment. The pipeline is split into several workflows for clarity and separation of concerns.  
+**A self-hosted GitHub Actions runner is configured on the AWS EC2 instance, giving the pipeline direct access to the Docker and Kubernetes environment.**
 
 ### 1. `ci.yml` (Continuous Integration)
 
@@ -108,4 +109,4 @@ npm install
 npm start
 ```
 
-The frontend will open at [http://localhost:3000](http://localhost:3000) and proxy API calls to the backend at [http://localhost:5000](http://localhost:5000).
+The frontend will open at [http://localhost:3000](http://localhost:3000) and proxy API calls to the
