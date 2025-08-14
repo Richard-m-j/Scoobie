@@ -29,3 +29,5 @@ jobs:
           
           # Creates a downloadable HTML report of the scan results
           artifact_name: 'zap-scan-report'
+
+          docker_options: '--user $(id -u)'
