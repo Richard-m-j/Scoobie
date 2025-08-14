@@ -109,4 +109,4 @@ npm install
 npm start
 ```
 
-The frontend will open at [http://localhost:3000](http://localhost:3000) and proxy API calls to the
+The frontend will open at [http://localhost:3000](http://localhost:3000) and proxy API calls to the backend at 0 [http://localhost:5000](http://localhost:5000)
