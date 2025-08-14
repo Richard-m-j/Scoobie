@@ -1,0 +1,29 @@
+# .github/workflows/dast.yml
+
+name: DAST - Dynamic Security Scan
+
+# This workflow runs manually from the Actions tab (workflow_dispatch)
+on:
+  workflow_dispatch:
+
+jobs:
+  zap-baseline-scan:
+    runs-on: ubuntu-latest
+    name: Scan live application with OWASP ZAP
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          ref: 'main'
+
+      - name: ZAP Baseline Scan
+        uses: owasp/zap-baseline-scan@v0.12.0
+        # This step will report issues but not fail the workflow run
+        continue-on-error: true
+        with:
+          # The public URL of your application running on EC2
+          target: 'http://${{ secrets.EC2_PUBLIC_IP }}:30007'
+          
+          # Creates a downloadable HTML report of the scan results
+          artifact_name: 'zap-scan-report'
