@@ -2,7 +2,6 @@
 
 name: DAST - Dynamic Security Scan
 
-# This workflow runs manually from the Actions tab (workflow_dispatch)
 on:
   workflow_dispatch:
 
@@ -18,8 +17,8 @@ jobs:
           ref: 'main'
 
       - name: ZAP Baseline Scan
-        uses: owasp/zap-baseline-scan@v0.12.0
-        # This step will report issues but not fail the workflow run
+        # The corrected path to the action is below
+        uses: zaproxy/action-baseline@v0.12.0
         continue-on-error: true
         with:
           # The public URL of your application running on EC2
