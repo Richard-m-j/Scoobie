@@ -1,27 +1,51 @@
 // src/App.js
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import './App.css';
 
 function App() {
-  const [message, setMessage] = useState('');
+  const [messages, setMessages] = useState([]);
+  const [newMessage, setNewMessage] = useState('');
   const [error, setError] = useState('');
 
-  const fetchMessage = async () => {
+  const fetchMessages = useCallback(async () => {
     try {
-      // This fetch call will be proxied to our backend.
       const response = await fetch('/api/messages');
-      
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
       }
-
       const data = await response.json();
-      // Our backend returns a list, so we'll take the text from the first item.
-      setMessage(data[0].text); 
-      setError(''); // Clear any previous errors
+      setMessages(data);
     } catch (err) {
-      setMessage('');
-      setError('Failed to fetch messages. Is the backend running?');
+      setError('Failed to fetch messages.');
+      console.error(err);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchMessages();
+  }, [fetchMessages]);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!newMessage.trim()) return;
+
+    try {
+      const response = await fetch('/api/messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ text: newMessage }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to post message.');
+      }
+      
+      setNewMessage(''); // Clear input field
+      fetchMessages(); // Refresh the list of messages
+    } catch (err) {
+      setError('Failed to add message.');
       console.error(err);
     }
   };
@@ -29,10 +53,24 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <h1>React Frontend</h1>
-        <button onClick={fetchMessage}>Get Message from Backend</button>
-        {message && <p className="message">{message}</p>}
+        <h1>My List</h1>
+        <form onSubmit={handleSubmit} className="message-form">
+          <input
+            type="text"
+            value={newMessage}
+            onChange={(e) => setNewMessage(e.target.value)}
+            placeholder="What's on your mind?"
+          />
+          <button type="submit">Add Item</button>
+        </form>
+
         {error && <p className="error">{error}</p>}
+
+        <ul className="message-list">
+          {messages.map((msg) => (
+            <li key={msg.id}>{msg.text}</li>
+          ))}
+        </ul>
       </header>
     </div>
   );
