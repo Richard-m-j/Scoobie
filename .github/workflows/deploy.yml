@@ -32,7 +32,6 @@ jobs:
       - name: Force new image pull by restarting deployments
         run: |
           echo "Restarting deployments in 'scoobie-app' namespace..."
-          # Using the correct deployment names from your YAML files
           kubectl rollout restart deployment/backend-deployment -n scoobie-app
           kubectl rollout restart deployment/frontend-deployment -n scoobie-app
 
