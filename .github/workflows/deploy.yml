@@ -2,7 +2,6 @@
 
 name: CD - Deploy to Kubernetes
 
-# This workflow is triggered by the completion of the build workflow
 on:
   workflow_run:
     workflows: ["CD - Build and Push Docker Images"]
@@ -16,7 +15,6 @@ jobs:
     # Only run this job if the triggering workflow was successful
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     
-    # This job must run on your EC2 instance to access kubectl
     runs-on: self-hosted
 
     steps:
@@ -26,14 +24,7 @@ jobs:
       - name: Apply Kubernetes Manifests
         run: |
           echo "Applying all configurations to the 'scoobie-app' namespace..."
-          # The -n flag specifies the namespace
           kubectl apply -f ./kubernetes -n scoobie-app
-      
-      - name: Force new image pull by restarting deployments
-        run: |
-          echo "Restarting deployments in 'scoobie-app' namespace..."
-          kubectl rollout restart deployment/backend-deployment -n scoobie-app
-          kubectl rollout restart deployment/frontend-deployment -n scoobie-app
 
       - name: Verify Backend Deployment Rollout
         run: kubectl rollout status deployment/backend-deployment -n scoobie-app --timeout=2m
