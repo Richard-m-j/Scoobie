@@ -19,7 +19,6 @@ jobs:
       - name: ZAP Baseline Scan
         # The corrected path to the action is below
         uses: zaproxy/action-baseline@v0.12.0
-        continue-on-error: true
         with:
           # The public URL of your application running on EC2
           target: 'http://${{ secrets.EC2_PUBLIC_IP }}:30007'
